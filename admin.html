@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cafe Admin Dashboard</title>
+<style>
+:root {
+  --bg:#f8f5f1;
+  --panel:#ffffff;
+  --primary:#7a4a2e;
+  --secondary:#c89b6d;
+  --accent:#2f855a;
+  --danger:#c53030;
+  --text:#2d2a26;
+  --muted:#7b726a;
+  --border:#e6dfd7;
+  --radius:16px;
+}
+* { box-sizing:border-box; font-family:Inter,system-ui,sans-serif; }
+body { margin:0; padding:20px; background:var(--bg); color:var(--text); }
+h2 { text-align:center; color:var(--primary); margin-bottom:10px; }
+.card { max-width:720px; margin:20px auto; background:var(--panel); padding:22px; border-radius:var(--radius); box-shadow:0 10px 30px rgba(0,0,0,.06);}
+input { width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); font-size:16px; margin-bottom:12px;}
+button { border:none; border-radius:12px; padding:10px 14px; font-weight:600; cursor:pointer; transition:all .2s ease;}
+button:hover { opacity:.85; }
+.btn-primary { background:var(--primary); color:#fff; width:100%; }
+.btn-logout { background:var(--danger); color:#fff; width:100%; margin-top:20px; }
+.category { margin-top:20px; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.category-header { padding:10px 14px; background:var(--secondary); color:white; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-weight:600; }
+.category-items { display:none; flex-direction:column; padding:10px; }
+.menu-item { display:grid; grid-template-columns:1fr 90px 60px 70px; gap:8px; align-items:center; padding:10px 0; border-bottom:1px dashed var(--border); transition: all .3s ease;}
+.menu-item span { font-weight:600; }
+.menu-item input { margin:0; text-align:center; }
+.save-btn { background:var(--accent); color:white; }
+.toggle { cursor:pointer; padding:6px 10px; border-radius:999px; font-size:12px; text-align:center; transition: all .3s ease; display:flex; justify-content:center; align-items:center; font-weight:600; }
+.toggle.on { background:#e6fffa; color:var(--accent); }
+.toggle.off { background:#fff5f5; color:var(--danger); }
+.updated { animation: flash .8s ease; }
+@keyframes flash { 0% { background:#fff3cd; } 100% { background:transparent; } }
+.toast { position:fixed; top:20px; right:20px; padding:12px 20px; border-radius:12px; color:white; font-weight:600; display:none; z-index:999; }
+.toast.success { background:var(--accent); }
+.toast.error { background:var(--danger); }
+@media(max-width:600px){ 
+  .menu-item { grid-template-columns:1fr; row-gap:8px; } 
+  .menu-item input, .menu-item button, .menu-item .toggle { width:100%; }
+}
+</style>
+</head>
+<body>
+
+<h2>☕ Cafe Admin Dashboard</h2>
+
+<div id="loginForm" class="card">
+  <input type="email" id="email" placeholder="Admin Email">
+  <input type="password" id="password" placeholder="Password">
+  <button id="loginBtn" class="btn-primary">Login</button>
+</div>
+
+<div id="adminPanel" class="card" style="display:none;">
+  <h3>Edit Menu</h3>
+  <div id="menuList"></div>
+  <button id="logoutBtn" class="btn-logout">Logout</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAlHN3EWZnMOXfa0RNWN6WpE9nrkivACs0",
+  authDomain: "cafe-menu-5358e.firebaseapp.com",
+  projectId: "cafe-menu-5358e",
+  storageBucket: "cafe-menu-5358e.firebasestorage.app",
+  messagingSenderId: "665214189728",
+  appId: "1:665214189728:web:d9ba3ff01681c06124c9c5"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// DOM references
+const loginForm = document.getElementById('loginForm');
+const adminPanel = document.getElementById('adminPanel');
+const menuList = document.getElementById('menuList');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const toast = document.getElementById('toast');
+
+loginBtn.onclick = () => {
+  signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
+    .catch(e => showToast(e.message, 'error'));
+};
+logoutBtn.onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    loginForm.style.display='none';
+    adminPanel.style.display='block';
+    loadMenu();
+  } else {
+    adminPanel.style.display='none';
+    loginForm.style.display='block';
+  }
+});
+
+function showToast(msg,type='success'){
+  toast.textContent = msg;
+  toast.className = `toast ${type}`;
+  toast.style.display='block';
+  setTimeout(()=>{ toast.style.display='none'; },2000);
+}
+
+async function loadMenu() {
+  menuList.innerHTML='';
+  const snap = await getDocs(collection(db,'menu'));
+  const grouped = {};
+
+  snap.forEach(d=>{
+    const data = d.data();
+    const category = data.category || 'Uncategorized';
+    if (!grouped[category]) grouped[category] = [];
+    grouped[category].push({
+      id: d.id,
+      active: data.active !== false,
+      name: data.name,
+      price: data.price
+    });
+  });
+
+  Object.keys(grouped).forEach(cat=>{
+    const cDiv = document.createElement('div');
+    cDiv.className = 'category';
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.innerHTML = `${cat} <span>▼</span>`;
+    const itemsDiv = document.createElement('div');
+    itemsDiv.className = 'category-items';
+
+    header.onclick = ()=>{
+      itemsDiv.style.display = itemsDiv.style.display==='flex'?'none':'flex';
+    }
+
+    grouped[cat].forEach(item=>{
+      const row = document.createElement('div');
+      row.className = 'menu-item';
+      row.innerHTML = `
+        <span>${item.name}</span>
+        <input type="number" value="${item.price}">
+        <button class="save-btn">Save</button>
+        <div class="toggle ${item.active?'on':'off'}">${item.active?'✔ ON':'✖ OFF'}</div>
+      `;
+
+      const priceInput = row.querySelector('input');
+      const saveBtn = row.querySelector('.save-btn');
+      const toggle = row.querySelector('.toggle');
+
+      priceInput.disabled = !item.active;
+      saveBtn.disabled = !item.active;
+      row.style.opacity = item.active ? '1' : '0.5';
+
+      saveBtn.onclick = async () => {
+        try{
+          await updateDoc(doc(db,'menu',item.id), { price:+priceInput.value });
+          priceInput.classList.add('updated');
+          showToast('Price updated!');
+          setTimeout(()=>priceInput.classList.remove('updated'),800);
+        } catch(e){ showToast('Error saving price','error'); }
+      };
+
+      toggle.onclick = async () => {
+        const newState = !item.active;
+        try{
+          await updateDoc(doc(db,'menu',item.id), { active: newState });
+          item.active = newState;
+          toggle.className = 'toggle ' + (newState?'on':'off');
+          toggle.textContent = newState?'✔ ON':'✖ OFF';
+          priceInput.disabled = !newState;
+          saveBtn.disabled = !newState;
+          row.style.opacity = newState ? '1' : '0.5';
+          showToast(newState?'Item enabled':'Item disabled');
+        } catch(e){ showToast('Error toggling item','error'); }
+      };
+
+      itemsDiv.appendChild(row);
+    });
+
+    cDiv.appendChild(header);
+    cDiv.appendChild(itemsDiv);
+    menuList.appendChild(cDiv);
+  });
+}
+
+
+</script>
+</body>
+</html>

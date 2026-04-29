@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title></title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+    <div class="nav-container">
+        <a class="logo" data-section="home">MR.COFFEE PLUS</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="am">አማ</button>
+        </div>
+        <div class="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+<!-- DIGITAL MENU SECTION -->
+<section id="menu" class="section menu-section">
+    <div class="menu-app">
+        <h2 class="section-title" id="menuTitle">Our Digital Menu</h2>
+        <div class="control-bar">
+            
+            <input type="text" id="searchInput" placeholder="Search dishes..." class="search-box">
+            <div class="fast-toggle">
+                <input type="checkbox" id="fastToggle">
+                <label for="fastToggle" id="fastLabel">🍃 Fasting menu only</label>
+            </div>
+        </div>
+
+        <div id="homeMenu" class="page active">
+            <div class="category-grid" id="categoryGrid"></div>
+        </div>
+
+        <div id="categoryPageMenu" class="page">
+            <div class="smart-back-wrapper">
+                <button id="backBtn" class="back-btn"><i class="fas fa-arrow-left"></i> <span id="backText">Back to Categories</span></button>
+                <div class="category-badge" id="categoryBadge">
+                    <i class="fas fa-tag"></i> <span id="currentCategoryDisplay">Select Category</span>
+                </div>
+            </div>
+            <div class="menu-grid" id="menuGrid"></div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER SECTION -->
+<footer id="contact" class="footer-roseau" style="scroll-margin-top: 70px;">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3 id="quickLinksTitle">Our social media</h3>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+        <div class="footer-section contact-info">
+            <h3 id="contactTitle">Contact Info</h3>
+            <p><i class="fas fa-map-marker-alt"></i> <span id="address">Addi Ababa, Ethiopia</span></p>
+            <p><i class="fas fa-phone-alt"></i> <a href="tel:+251977782907">+251977782907</a></p>
+            <p><i class="fas fa-phone-alt"></i> <a href="tel:+251977782907">+251977782907</a></p>
+            <p><i class="fas fa-envelope"></i> <a href="mailto:support@ethionova.com">support@ethionova.com</a></p>
+        </div>
+        <div class="footer-section">
+            <h3 id="hoursTitle">Opening Hours</h3>
+            <div class="hours-info">
+                <p id="hoursText"><strong>monday - Sunday</strong></p>
+                <div class="badge-24"><i class="fas fa-clock"></i> <span id="alwaysOpen">Always Open</span></div>
+            </div>
+        </div>
+        <div class="footer-section payment-section">
+            <h3 id="paymentTitle">Payment Methods</h3>
+            <ul class="payment-list">
+                <li><img src="image/telebirr.svg.jpg" alt="Telebirr" onerror="this.style.display='none'; this.nextSibling.style.marginLeft='0'"> <span>Telebirr: 09xxxxxxx</span></li>
+                <li><img src="image/cbe.svg.jpg" alt="CBE" onerror="this.style.display='none'; this.nextSibling.style.marginLeft='0'"> <span>CBE Birr: 1000xxxxxxx</span></li>
+                <li><img src="image/boa.svg.jpg" alt="BOA" onerror="this.style.display='none'; this.nextSibling.style.marginLeft='0'"> <span>Bank of Abyssinia: 977xxxxxxx</span></li>
+                <li><img src="image/awash.svg.jpg" alt="Awash" onerror="this.style.display='none'; this.nextSibling.style.marginLeft='0'"> <span>Awash Bank: 878xxxxxxx</span></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p id="copyright">© 2025 MR.COFFEE PLUS| Powered by Ethionova | All rights reserved.</p>
+        <a href="admin.html" class="admin-link" id="adminDashboardBtn">
+            <i class="fas fa-crown"></i> <span>Admin Dashboard</span>
+        </a>
+    </div>
+</footer>
+
+<script type="module" src="menu.js"></script>
+</body>
+</html>

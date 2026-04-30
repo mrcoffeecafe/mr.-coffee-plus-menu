@@ -5,7 +5,7 @@ import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/fi
 
 // 🔐 Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyC0dLDtzDqzrFhboRd2WK2l3katZsiM8ps",
+  apiKey: "YOUR_API_KEY",
   authDomain: "mr-coffee-menu.firebaseapp.com",
   projectId: "mr-coffee-menu",
   storageBucket: "mr-coffee-menu.firebasestorage.app",
@@ -41,13 +41,13 @@ const categoryPage = document.getElementById("categoryPageMenu");
 
 /* ================= CATEGORY ================= */
 const CATEGORY_NAMES = {
-  wrap: { en: "wrap", am: "" },
+  wrap: { en: "Wrap", am: "" },
   drink: { en: "Cold Drinks", am: "ቀዝቃዛ መጠጦች" },
   breakfast: { en: "Breakfast", am: "ቁርስ" },
   hotdrink: { en: "Hot Drinks", am: "ትኩስ መጠጦች" },
   salad: { en: "Salad", am: "ሳላድ" },
-  burrito: { en: "burrito", am: "" },
-  shake: { en: "shake", am: "ሚልክሸክ" },
+  burrito: { en: "Burrito", am: "" },
+  shake: { en: "Shake", am: "ሚልክሸክ" },
   burger: { en: "Burger", am: "በርገር" },
   fajita: { en: "Fajita", am: "ፍጅታ" },
   fish: { en: "Fish", am: "አሳ" },
@@ -63,9 +63,7 @@ const CATEGORY_NAMES = {
   extra: { en: "Extra", am: "Extra" },
   juice: { en: "Juice", am: "ጁስ" },
   softdrink: { en: "Soft Drink", am: "ለስላሳ" },
-  soup: { en: "soup", am: "" },
-  
-
+  soup: { en: "Soup", am: "" },
 };
 
 const CATEGORY_MAP = {
@@ -73,10 +71,10 @@ const CATEGORY_MAP = {
   breakfast: "breakfast",
   drink: "drink",
   colddrink: "drink",
+  "cold drink": "drink",
   hotdrink: "hotdrink",
   "hot drink": "hotdrink",
   salad: "salad",
-  dessert: "dessert",
   burrito: "burrito",
   shake: "shake",
   burger: "burger",
@@ -136,20 +134,33 @@ onSnapshot(collection(db, "menu"), (snapshot) => {
 
     if (d.active === false) return;
 
-    const cat = CATEGORY_MAP[d.category?.toLowerCase().trim()];
-    if (!cat) return;
+    const rawCategory = (d.category || "").toString();
+    const cleanCategory = rawCategory.toLowerCase().trim();
 
-    menuItems.push({
+    const cat = CATEGORY_MAP[cleanCategory];
+
+    if (!cat) {
+      console.warn("❌ Unknown category in Firebase:", rawCategory);
+      return;
+    }
+
+    const item = {
       category: cat,
       name: d.name || "Unnamed",
       desc: d.desc || "",
       price: d.price || 0,
       fastAllowed: !!d.fastAllowed,
-      img: (d.img || "default.jpg").trim(), // 🔥 FIX SPACE BUG
+      img: (d.img || "default.jpg").trim(),
       amName: d.amName || d.name,
       amDesc: d.amDesc || d.desc
-    });
+    };
+
+    console.log("✅ Loaded item:", item.name, "| category:", cat);
+
+    menuItems.push(item);
   });
+
+  console.log("🔥 ALL MENU ITEMS:", menuItems);
 
   renderHome();
 });
@@ -184,7 +195,11 @@ function renderMenu() {
   const term = searchInput.value.toLowerCase();
   let hasItems = false;
 
+  console.log("📂 Current category:", currentCategory);
+
   menuItems.forEach(item => {
+    console.log("➡ Checking:", item.name, "|", item.category);
+
     if (currentCategory && item.category !== currentCategory) return;
     if (fastMode && !item.fastAllowed) return;
 

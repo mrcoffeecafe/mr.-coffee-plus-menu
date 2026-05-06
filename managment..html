@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaféFlow — Admin Dashboard</title>
+    <style>
+        :root {
+            --sidebar-bg: #1a100b;
+            --sidebar-hover: #2a1b13;
+            --sidebar-active: #3d2619;
+            --sidebar-text: #c4b5a9;
+            --sidebar-text-active: #f5ede3;
+            --accent: #c8956c;
+            --accent-light: #e8d5c4;
+            --accent-dark: #a0724a;
+            --bg: #f9f6f2;
+            --card-bg: #ffffff;
+            --card-shadow: 0 1px 3px rgba(26, 16, 11, 0.06), 0 1px 2px rgba(26, 16, 11, 0.04);
+            --card-shadow-hover: 0 4px 16px rgba(26, 16, 11, 0.1), 0 2px 4px rgba(26, 16, 11, 0.06);
+            --text-primary: #1a100b;
+            --text-secondary: #6b5e55;
+            --text-muted: #9a8d84;
+            --border: #e8e0d9;
+            --border-light: #f0eae4;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --info: #6366f1;
+            --info-bg: #eef2ff;
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            --sidebar-width: 240px;
+            --header-height: 64px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform var(--transition);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar-logo {
+            padding: 20px 20px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo .logo-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #f5ede3;
+            letter-spacing: -0.3px;
+        }
+        .sidebar-logo .logo-text span {
+            color: var(--accent);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sidebar-nav .nav-section {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b5e55;
+            padding: 14px 12px 6px;
+            font-weight: 600;
+        }
+
+        .sidebar-nav button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 14px;
+            border: none;
+            background: transparent;
+            color: var(--sidebar-text);
+            font-size: 0.9rem;
+            font-family: var(--font);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition);
+            text-align: left;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .sidebar-nav button:hover {
+            background: var(--sidebar-hover);
+            color: #e8ddd3;
+        }
+        .sidebar-nav button.active {
+            background: var(--sidebar-active);
+            color: var(--sidebar-text-active);
+            font-weight: 600;
+            box-shadow: inset 3px 0 0 var(--accent);
+        }
+        .sidebar-nav button .nav-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: currentColor;
+            opacity: 0.45;
+            transition: all var(--transition);
+        }
+        .sidebar-nav button.active .nav-dot {
+            opacity: 1;
+            background: var(--accent);
+            box-shadow: 0 0 8px rgba(200, 149, 108, 0.5);
+        }
+        .sidebar-nav button .badge-pill {
+            margin-left: auto;
+            font-size: 0.7rem;
+            background: var(--danger);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+        }
+        .sidebar-footer .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #c4b5a9;
+            font-size: 0.82rem;
+        }
+        .sidebar-footer .user-mini .avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        /* ============ HEADER ============ */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+            z-index: 90;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        .header .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+        }
+        .header .hamburger:hover {
+            background: var(--border-light);
+        }
+
+        .header .search-wrap {
+            flex: 1;
+            max-width: 420px;
+            position: relative;
+        }
+        .header .search-wrap input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 25px;
+            font-size: 0.88rem;
+            font-family: var(--font);
+            background: var(--bg);
+            transition: all var(--transition);
+            color: var(--text-primary);
+        }
+        .header .search-wrap input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(200, 149, 108, 0.1);
+            background: #fff;
+        }
+        .header .search-wrap .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .header-actions .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .header-actions .icon-btn:hover {
+            background: var(--border-light);
+            color: var(--text-primary);
+        }
+        .header-actions .icon-btn .notif-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--danger);
+            border: 2px solid #fff;
+        }
+        .header-actions .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px 6px 6px;
+            border-radius: 25px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: var(--font);
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .header-actions .profile-btn:hover {
+            background: var(--border-light);
+        }
+        .header-actions .profile-btn .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c8956c, #8b5e3c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 24px 28px 40px;
+            flex: 1;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin var(--transition);
+        }
+
+        .page {
+            display: none;
+            animation: fadeSlideIn 0.35s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        /* ============ KPI CARDS ============ */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 20px 22px;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition);
+            border: 1px solid transparent;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card:hover {
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--border);
+            transform: translateY(-2px);
+        }
+        .kpi-card .kpi-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+        .kpi-card .kpi-icon.revenue {
+            background: #ecfdf5;
+            color: #10b981;
+        }
+        .kpi-card .kpi-icon.orders {
+            background: #eef2ff;
+            color: #6366f1;
+        }
+        .kpi-card .kpi-icon.alert {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        .kpi-card .kpi-icon.active-orders {
+            background: #fffbeb;
+            color: #f59e0b;
+        }
+        .kpi-card .kpi-label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .kpi-card .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 2px;
+            letter-spacing: -0.5px;
+        }
+        .kpi-card .kpi-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .kpi-card .kpi-sub.up {
+            color: var(--success);
+        }
+        .kpi-card .kpi-sub.down {
+            color: var(--danger);
+        }
+
+        /* ============ CARDS & TABLES ============ */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid transparent;
+            overflow: hidden;
+            transition: all var(--transition);
+        }
+        .card:hover {
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--border);
+        }
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .card-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+        }
+        .card-body {
+            padding: 16px 20px;
+            overflow-x: auto;
+        }
+        .card-body.no-padding {
+            padding: 0;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border-radius: 22px;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font);
+            font-size: 0.84rem;
+            font-weight: 600;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: -0.1px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--accent-dark);
+            box-shadow: 0 2px 8px rgba(160, 114, 74, 0.3);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent-dark);
+            background: #fdf9f5;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.76rem;
+            border-radius: 16px;
+        }
+        .btn-danger-sm {
+            padding: 5px 12px;
+            font-size: 0.76rem;
+            border-radius: 16px;
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid #fecaca;
+            cursor: pointer;
+            font-family: var(--font);
+            font-weight: 500;
+            transition: all var(--transition);
+        }
+        .btn-danger-sm:hover {
+            background: #fee2e2;
+        }
+        .btn-edit-sm {
+            padding: 5px 12px;
+            font-size: 0.76rem;
+            border-radius: 16px;
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid #c7d2fe;
+            cursor: pointer;
+            font-family: var(--font);
+            font-weight: 500;
+            transition: all var(--transition);
+        }
+        .btn-edit-sm:hover {
+            background: #dde4ff;
+        }
+        .btn-success-sm {
+            padding: 5px 12px;
+            font-size: 0.76rem;
+            border-radius: 16px;
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid #a7f3d0;
+            cursor: pointer;
+            font-family: var(--font);
+            font-weight: 500;
+            transition: all var(--transition);
+        }
+        .btn-success-sm:hover {
+            background: #d1fae5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.86rem;
+        }
+        table th {
+            text-align: left;
+            padding: 12px 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--border-light);
+            white-space: nowrap;
+        }
+        table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        table tbody tr {
+            transition: background var(--transition);
+        }
+        table tbody tr:hover {
+            background: #fdfaf7;
+        }
+        table .text-muted {
+            color: var(--text-muted);
+        }
+        table .text-danger {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        table .text-success {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            text-transform: capitalize;
+        }
+        .badge-success {
+            background: var(--success-bg);
+            color: #059669;
+        }
+        .badge-warning {
+            background: var(--warning-bg);
+            color: #b45309;
+        }
+        .badge-info {
+            background: var(--info-bg);
+            color: #4f46e5;
+        }
+        .badge-danger {
+            background: var(--danger-bg);
+            color: #dc2626;
+        }
+        .badge-neutral {
+            background: #f5f0eb;
+            color: #6b5e55;
+        }
+
+        /* ============ GRID LAYOUTS ============ */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        .grid-2-1 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        .span-2 {
+            grid-column: span 2;
+        }
+
+        /* ============ CHART AREA ============ */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 260px;
+        }
+        .chart-container canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* ============ TOP SELLING LIST ============ */
+        .top-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .top-item:last-child {
+            border-bottom: none;
+        }
+        .top-item .rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+        .top-item .rank.gold {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .top-item .rank.silver {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .top-item .rank.bronze {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .top-item .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .top-item .item-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text-primary);
+        }
+        .top-item .item-sold {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+        .top-item .item-revenue {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        /* ============ MODAL ============ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 16, 11, 0.5);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-overlay.hidden {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: #fff;
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            animation: modalPop 0.3s ease;
+        }
+        @keyframes modalPop {
+            from {
+                opacity: 0;
+                transform: scale(0.94) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: var(--text-primary);
+        }
+        .modal .form-group {
+            margin-bottom: 14px;
+        }
+        .modal .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .modal .form-group input,
+        .modal .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font);
+            font-size: 0.9rem;
+            transition: all var(--transition);
+            background: #fafaf8;
+        }
+        .modal .form-group input:focus,
+        .modal .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(200, 149, 108, 0.08);
+            background: #fff;
+        }
+        .modal .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* ============ TOGGLE SWITCH ============ */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #d1cbc4;
+            border-radius: 24px;
+            transition: var(--transition);
+        }
+        .toggle-switch .slider::before {
+            content: '';
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .toggle-switch input:checked+.slider {
+            background: var(--success);
+        }
+        .toggle-switch input:checked+.slider::before {
+            transform: translateX(20px);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .grid-2,
+            .grid-2-1 {
+                grid-template-columns: 1fr;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .span-2 {
+                grid-column: span 1;
+            }
+            .kpi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            }
+            .header .search-wrap {
+                max-width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .header {
+                left: 0;
+            }
+            .header .hamburger {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .kpi-card {
+                padding: 14px 16px;
+            }
+            .kpi-card .kpi-value {
+                font-size: 1.5rem;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .header .search-wrap {
+                max-width: 180px;
+            }
+            .header-actions .profile-btn span {
+                display: none;
+            }
+            table {
+                font-size: 0.78rem;
+            }
+            table th,
+            table td {
+                padding: 8px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                padding: 0 12px;
+                gap: 8px;
+            }
+            .main-content {
+                padding: 16px 12px 30px;
+            }
+            .modal {
+                padding: 20px;
+                border-radius: var(--radius-lg);
+            }
+        }
+
+        /* Mobile sidebar overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+        .sidebar-overlay.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">☕</div>
+            <div class="logo-text">Café<span>Flow</span></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">Main</div>
+            <button class="active" data-page="dashboard">
+                <span class="nav-dot"></span> Dashboard Overview
+            </button>
+            <button data-page="menu">
+                <span class="nav-dot"></span> Menu Management
+            </button>
+            <button data-page="inventory">
+                <span class="nav-dot"></span> Inventory
+                <span class="badge-pill" id="lowStockBadge">3</span>
+            </button>
+            <div class="nav-section">Operations</div>
+            <button data-page="orders">
+                <span class="nav-dot"></span> Orders Monitoring
+                <span class="badge-pill" id="activeOrdersBadge">5</span>
+            </button>
+            <button data-page="staff">
+                <span class="nav-dot"></span> Staff Management
+            </button>
+            <div class="nav-section">Insights</div>
+            <button data-page="reports">
+                <span class="nav-dot"></span> Reports & Revenue
+            </button>
+            <button data-page="settings">
+                <span class="nav-dot"></span> Settings
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-mini">
+                <div class="avatar-sm">MO</div>
+                <div>
+                    <strong style="color:#e8ddd3;">Maria Owens</strong>
+                    <br><small style="font-size:0.7rem;color:#8a7d73;">Owner</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ============ HEADER ============ -->
+    <header class="header" id="header">
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle sidebar">☰</button>
+        <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="globalSearch" placeholder="Search orders, menu items..." />
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="notifBtn" title="Notifications">
+                🔔<span class="notif-dot"></span>
+            </button>
+            <button class="profile-btn">
+                <div class="avatar">MO</div>
+                <span>Maria</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content" id="mainContent">
+
+        <!-- DASHBOARD PAGE -->
+        <section class="page active" id="page-dashboard">
+            <div class="page-header">
+                <h1>Dashboard Overview</h1>
+                <p>Real-time snapshot of your café — <span id="liveTime"></span></p>
+            </div>
+            <div class="kpi-grid" id="kpiGrid">
+                <!-- Filled by JS -->
+            </div>
+            <div class="grid-2-1" style="margin-top: 4px;">
+                <div class="card span-2" style="grid-column: span 2;">
+                    <div class="card-header">
+                        <h3>📊 Daily Sales — Past 7 Days</h3>
+                        <span style="font-size:0.78rem;color:var(--text-muted);">in USD</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container"><canvas id="salesChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>🔥 Top Selling Items</h3></div>
+                    <div class="card-body" id="topSellingList"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>⚠️ Low Inventory Warnings</h3>
+                        <a href="#" style="font-size:0.78rem;color:var(--accent-dark);text-decoration:none;" data-nav="inventory">View all →</a>
+                    </div>
+                    <div class="card-body" id="lowInventoryList"></div>
+                </div>
+                <div class="card span-2" style="grid-column: span 2;">
+                    <div class="card-header">
+                        <h3>📋 Recent Orders</h3>
+                        <a href="#" style="font-size:0.78rem;color:var(--accent-dark);text-decoration:none;" data-nav="orders">All orders →</a>
+                    </div>
+                    <div class="card-body no-padding">
+                        <table id="recentOrdersTable">
+                            <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Time</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MENU MANAGEMENT PAGE -->
+        <section class="page" id="page-menu">
+            <div class="page-header">
+                <h1>Menu Management</h1>
+                <p>Add, edit, or remove items from your café menu</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>📝 Menu Items</h3>
+                    <button class="btn btn-primary" id="openAddMenuItemBtn">+ Add New Item</button>
+                </div>
+                <div class="card-body no-padding">
+                    <table id="menuTable">
+                        <thead><tr><th>#</th><th>Name</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- INVENTORY PAGE -->
+        <section class="page" id="page-inventory">
+            <div class="page-header">
+                <h1>Inventory</h1>
+                <p>Track ingredient stock levels</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>📦 Ingredients Stock</h3>
+                    <button class="btn btn-outline btn-sm" id="refreshInventoryBtn">🔄 Refresh</button>
+                </div>
+                <div class="card-body no-padding">
+                    <table id="inventoryTable">
+                        <thead><tr><th>Ingredient</th><th>Quantity</th><th>Unit</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ORDERS MONITORING PAGE -->
+        <section class="page" id="page-orders">
+            <div class="page-header">
+                <h1>Orders Monitoring</h1>
+                <p>Track and manage all incoming orders</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>🛒 All Orders</h3>
+                    <div style="display:flex;gap:6px;">
+                        <button class="btn btn-outline btn-sm filter-order-btn active" data-filter="all">All</button>
+                        <button class="btn btn-outline btn-sm filter-order-btn" data-filter="Pending">Pending</button>
+                        <button class="btn btn-outline btn-sm filter-order-btn" data-filter="Preparing">Preparing</button>
+                        <button class="btn btn-outline btn-sm filter-order-btn" data-filter="Done">Done</button>
+                    </div>
+                </div>
+                <div class="card-body no-padding">
+                    <table id="ordersTableFull">
+                        <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Time</th><th>Action</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- STAFF MANAGEMENT PAGE -->
+        <section class="page" id="page-staff">
+            <div class="page-header">
+                <h1>Staff Management</h1>
+                <p>Manage employee accounts and roles</p>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>👥 Employees</h3>
+                    <button class="btn btn-outline btn-sm" id="addStaffBtn">+ Add Staff</button>
+                </div>
+                <div class="card-body no-padding">
+                    <table id="staffTable">
+                        <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Status</th><th>Active</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- REPORTS PAGE -->
+        <section class="page" id="page-reports">
+            <div class="page-header">
+                <h1>Reports & Revenue</h1>
+                <p>Monthly performance summary</p>
+            </div>
+            <div class="kpi-grid" id="reportKpiGrid"></div>
+            <div class="grid-2" style="margin-top:4px;">
+                <div class="card">
+                    <div class="card-header"><h3>📈 Weekly Revenue Chart</h3></div>
+                    <div class="card-body"><div class="chart-container"><canvas id="reportChart"></canvas></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>🏆 Best-Selling Items This Month</h3></div>
+                    <div class="card-body" id="reportTopItems"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS PAGE -->
+        <section class="page" id="page-settings">
+            <div class="page-header">
+                <h1>Settings</h1>
+                <p>Configure your café profile and preferences</p>
+            </div>
+            <div class="card" style="max-width:600px;">
+                <div class="card-header"><h3>⚙️ General Settings</h3></div>
+                <div class="card-body">
+                    <div class="form-group" style="margin-bottom:14px;">
+                        <label style="font-weight:600;font-size:0.8rem;text-transform:uppercase;color:var(--text-secondary);">Café Name</label>
+                        <input type="text" value="The Daily Grind" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:0.9rem;" />
+                    </div>
+                    <div class="form-group" style="margin-bottom:14px;">
+                        <label style="font-weight:600;font-size:0.8rem;text-transform:uppercase;color:var(--text-secondary);">Currency</label>
+                        <select style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:0.9rem;">
+                            <option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============ MODAL: Add/Edit Menu Item ============ -->
+    <div class="modal-overlay hidden" id="menuModalOverlay">
+        <div class="modal">
+            <h3 id="menuModalTitle">Add New Menu Item</h3>
+            <form id="menuForm">
+                <input type="hidden" id="menuEditIndex" value="-1" />
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="menuName" placeholder="e.g. Cappuccino" required />
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="menuCategory">
+                        <option>Hot Drinks</option><option>Cold Drinks</option><option>Pastries</option><option>Sandwiches</option><option>Desserts</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price ($)</label>
+                    <input type="number" id="menuPrice" placeholder="4.50" step="0.01" min="0" required />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="cancelMenuBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============ MODAL: Update Inventory Stock ============ -->
+    <div class="modal-overlay hidden" id="inventoryModalOverlay">
+        <div class="modal">
+            <h3>Update Stock</h3>
+            <form id="inventoryForm">
+                <input type="hidden" id="invEditIndex" value="-1" />
+                <p style="margin-bottom:8px;font-weight:600;" id="invItemName"></p>
+                <div class="form-group">
+                    <label>New Quantity</label>
+                    <input type="number" id="invNewQty" placeholder="Enter quantity" step="0.1" min="0" required />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="cancelInvBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== DATA LAYER ====================
+            const menuItems = [
+                { id: 1, name: 'Espresso', category: 'Hot Drinks', price: 3.50 },
+                { id: 2, name: 'Cappuccino', category: 'Hot Drinks', price: 4.50 },
+                { id: 3, name: 'Latte', category: 'Hot Drinks', price: 4.75 },
+                { id: 4, name: 'Mocha', category: 'Hot Drinks', price: 5.25 },
+                { id: 5, name: 'Americano', category: 'Hot Drinks', price: 3.75 },
+                { id: 6, name: 'Flat White', category: 'Hot Drinks', price: 4.90 },
+                { id: 7, name: 'Hot Chocolate', category: 'Hot Drinks', price: 4.25 },
+                { id: 8, name: 'Chai Latte', category: 'Hot Drinks', price: 4.80 },
+                { id: 9, name: 'Matcha Latte', category: 'Hot Drinks', price: 5.50 },
+                { id: 10, name: 'Iced Latte', category: 'Cold Drinks', price: 5.00 },
+                { id: 11, name: 'Cold Brew', category: 'Cold Drinks', price: 4.50 },
+                { id: 12, name: 'Iced Matcha', category: 'Cold Drinks', price: 5.75 },
+                { id: 13, name: 'Croissant', category: 'Pastries', price: 3.25 },
+                { id: 14, name: 'Blueberry Muffin', category: 'Pastries', price: 3.75 },
+                { id: 15, name: 'Banana Bread', category: 'Pastries', price: 4.00 },
+                { id: 16, name: 'Avocado Toast', category: 'Sandwiches', price: 8.50 },
+                { id: 17, name: 'Ham & Cheese Panini', category: 'Sandwiches', price: 7.75 },
+                { id: 18, name: 'Tiramisu', category: 'Desserts', price: 6.50 },
+                { id: 19, name: 'Chocolate Chip Cookie', category: 'Desserts', price: 2.75 },
+                { id: 20, name: 'Cheesecake Slice', category: 'Desserts', price: 5.95 },
+            ];
+
+            const inventory = [
+                { name: 'Coffee Beans (Arabica)', quantity: 12, unit: 'kg', threshold: 5 },
+                { name: 'Milk (Whole)', quantity: 28, unit: 'liters', threshold: 10 },
+                { name: 'Sugar', quantity: 8, unit: 'kg', threshold: 5 },
+                { name: 'Chocolate Syrup', quantity: 2.5, unit: 'liters', threshold: 3 },
+                { name: 'Vanilla Syrup', quantity: 1.8, unit: 'liters', threshold: 2 },
+                { name: 'Matcha Powder', quantity: 0.6, unit: 'kg', threshold: 1 },
+                { name: 'Chai Spice Mix', quantity: 3.2, unit: 'kg', threshold: 2 },
+                { name: 'Flour', quantity: 15, unit: 'kg', threshold: 8 },
+                { name: 'Butter', quantity: 4, unit: 'kg', threshold: 3 },
+                { name: 'Eggs', quantity: 60, unit: 'units', threshold: 30 },
+                { name: 'Blueberries', quantity: 1.5, unit: 'kg', threshold: 2 },
+                { name: 'Bananas', quantity: 4, unit: 'kg', threshold: 3 },
+                { name: 'Avocado', quantity: 6, unit: 'units', threshold: 5 },
+                { name: 'Ham Slices', quantity: 2, unit: 'kg', threshold: 2.5 },
+                { name: 'Cream Cheese', quantity: 3.5, unit: 'kg', threshold: 2 },
+            ];
+
+            const staff = [
+                { name: 'Maria Owens', role: 'Admin', email: 'maria@cafeflow.com', active: true },
+                { name: 'James Chen', role: 'Cashier', email: 'james@cafeflow.com', active: true },
+                { name: 'Elena Rossi', role: 'Kitchen', email: 'elena@cafeflow.com', active: true },
+                { name: 'David Kim', role: 'Cashier', email: 'david@cafeflow.com', active: false },
+                { name: 'Sophie Laurent', role: 'Kitchen', email: 'sophie@cafeflow.com', active: true },
+                { name: 'Ahmed Hassan', role: 'Cashier', email: 'ahmed@cafeflow.com', active: true },
+            ];
+
+            const orders = [
+                { id: '#CF-1042', customer: 'Alice Walker', items: 3, total: 14.25, status: 'Done',
+                    time: '10:32 AM' },
+                { id: '#CF-1043', customer: 'Bob Martinez', items: 1, total: 4.50, status: 'Done',
+                time: '10:45 AM' },
+                { id: '#CF-1044', customer: 'Claire Nguyen', items: 4, total: 22.00, status: 'Preparing',
+                    time: '11:02 AM' },
+                { id: '#CF-1045', customer: 'Dan O\'Brien', items: 2, total: 9.25, status: 'Pending',
+                    time: '11:15 AM' },
+                { id: '#CF-1046', customer: 'Emma Stone', items: 1, total: 5.50, status: 'Preparing',
+                time: '11:28 AM' },
+                { id: '#CF-1047', customer: 'Frank Liu', items: 5, total: 31.75, status: 'Pending',
+                time: '11:40 AM' },
+                { id: '#CF-1048', customer: 'Grace Patel', items: 2, total: 8.75, status: 'Done', time: '11:52 AM' },
+                { id: '#CF-1049', customer: 'Henry Ford', items: 3, total: 16.50, status: 'Preparing',
+                time: '12:05 PM' },
+                { id: '#CF-1050', customer: 'Iris Chen', items: 1, total: 3.75, status: 'Pending', time: '12:18 PM' },
+                { id: '#CF-1051', customer: 'Jack Turner', items: 6, total: 38.40, status: 'Pending',
+                time: '12:30 PM' },
+            ];
+
+            let nextMenuId = 21;
+
+            // ==================== LOGIC LAYER ====================
+            function getTodayRevenue() {
+                const todayOrders = orders.filter(o => o.time.includes('AM') || o.time.includes('PM'));
+                return todayOrders.reduce((sum, o) => sum + o.total, 0);
+            }
+
+            function getTotalOrdersToday() {
+                return orders.length;
+            }
+
+            function getLowStockCount() {
+                return inventory.filter(i => i.quantity <= i.threshold).length;
+            }
+
+            function getActiveOrdersCount() {
+                return orders.filter(o => o.status === 'Pending' || o.status === 'Preparing').length;
+            }
+
+            function getLowStockItems() {
+                return inventory.filter(i => i.quantity <= i.threshold);
+            }
+
+            function getTopSellingItems() {
+                const itemSales = {};
+                orders.forEach(o => {
+                    const itemName = menuItems[o.items % menuItems.length]?.name || 'Unknown';
+                    itemSales[itemName] = (itemSales[itemName] || 0) + o.items;
+                });
+                const sorted = Object.entries(itemSales).sort((a, b) => b[1] - a[1]);
+                return sorted.slice(0, 5).map(([name, sold], i) => ({
+                    name,
+                    sold,
+                    revenue: (sold * (menuItems.find(m => m.name === name)?.price || 4.5))
+                        .toFixed(2),
+                    rank: i + 1
+                }));
+            }
+
+            // ==================== UI RENDER FUNCTIONS ====================
+            function renderKPIs() {
+                const revenue = getTodayRevenue();
+                const totalOrders = getTotalOrdersToday();
+                const lowStock = getLowStockCount();
+                const activeOrders = getActiveOrdersCount();
+                document.getElementById('kpiGrid').innerHTML = `
+                    <div class="kpi-card">
+                        <div class="kpi-icon revenue">💰</div>
+                        <div class="kpi-label">Today's Revenue</div>
+                        <div class="kpi-value">$${revenue.toFixed(2)}</div>
+                        <div class="kpi-sub up">↑ 8.2% vs yesterday</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon orders">📦</div>
+                        <div class="kpi-label">Total Orders</div>
+                        <div class="kpi-value">${totalOrders}</div>
+                        <div class="kpi-sub up">↑ 12% vs yesterday</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon alert">⚠️</div>
+                        <div class="kpi-label">Low Stock Alerts</div>
+                        <div class="kpi-value">${lowStock}</div>
+                        <div class="kpi-sub down">Needs attention</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon active-orders">🔄</div>
+                        <div class="kpi-label">Active Orders</div>
+                        <div class="kpi-value">${activeOrders}</div>
+                        <div class="kpi-sub">In progress</div>
+                    </div>
+                `;
+                document.getElementById('lowStockBadge').textContent = lowStock;
+                document.getElementById('activeOrdersBadge').textContent = activeOrders;
+            }
+
+            function renderReportKPIs() {
+                const revenue = getTodayRevenue();
+                document.getElementById('reportKpiGrid').innerHTML = `
+                    <div class="kpi-card"><div class="kpi-icon revenue">💰</div><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">$${(revenue * 28).toFixed(2)}</div><div class="kpi-sub up">↑ 5.4% vs last month</div></div>
+                    <div class="kpi-card"><div class="kpi-icon orders">📦</div><div class="kpi-label">Monthly Orders</div><div class="kpi-value">${orders.length * 28}</div><div class="kpi-sub up">↑ 7.1% vs last month</div></div>
+                    <div class="kpi-card"><div class="kpi-icon active-orders">⭐</div><div class="kpi-label">Avg Order Value</div><div class="kpi-value">$${(revenue / Math.max(1, orders.length)).toFixed(2)}</div><div class="kpi-sub">Per transaction</div></div>
+                    <div class="kpi-card"><div class="kpi-icon alert">🎯</div><div class="kpi-label">Top Item</div><div class="kpi-value" style="font-size:1.2rem;">${getTopSellingItems()[0]?.name || 'N/A'}</div><div class="kpi-sub up">Best performer</div></div>
+                `;
+            }
+
+            function renderRecentOrders() {
+                const tbody = document.querySelector('#recentOrdersTable tbody');
+                const recent = [...orders].reverse().slice(0, 6);
+                tbody.innerHTML = recent.map(o => {
+                    let badgeClass = 'badge-neutral';
+                    if (o.status === 'Done') badgeClass = 'badge-success';
+                    if (o.status === 'Preparing') badgeClass = 'badge-info';
+                    if (o.status === 'Pending') badgeClass = 'badge-warning';
+                    return `<tr>
+                        <td><strong>${o.id}</strong></td>
+                        <td>${o.customer}</td>
+                        <td>${o.items} item(s)</td>
+                        <td><strong>$${o.total.toFixed(2)}</strong></td>
+                        <td><span class="badge ${badgeClass}">${o.status}</span></td>
+                        <td class="text-muted">${o.time}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            function renderTopSelling() {
+                const items = getTopSellingItems();
+                const rankClasses = ['gold', 'silver', 'bronze', '', ''];
+                document.getElementById('topSellingList').innerHTML = items.map((item, i) => `
+                    <div class="top-item">
+                        <div class="rank ${rankClasses[i] || ''}">${item.rank}</div>
+                        <div class="item-info"><div class="item-name">${item.name}</div><div class="item-sold">${item.sold} sold</div></div>
+                        <div class="item-revenue">$${item.revenue}</div>
+                    </div>
+                `).join('');
+            }
+
+            function renderLowInventory() {
+                const lowItems = getLowStockItems();
+                document.getElementById('lowInventoryList').innerHTML = lowItems.length === 0 ?
+                    '<p style="color:var(--success);font-weight:500;">✅ All stock levels are good!</p>' :
+                    lowItems.map(i => `
+                        <div class="top-item">
+                            <span style="font-size:1.3rem;">⚠️</span>
+                            <div class="item-info"><div class="item-name">${i.name}</div><div class="item-sold text-danger">${i.quantity} ${i.unit} remaining</div></div>
+                            <span style="font-size:0.78rem;color:var(--danger);font-weight:600;">Low</span>
+                        </div>
+                    `).join('');
+            }
+
+            function renderMenuTable() {
+                const tbody = document.querySelector('#menuTable tbody');
+                tbody.innerHTML = menuItems.map((item, idx) => `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td><strong>${item.name}</strong></td>
+                        <td><span class="badge badge-neutral">${item.category}</span></td>
+                        <td><strong>$${item.price.toFixed(2)}</strong></td>
+                        <td>
+                            <button class="btn-edit-sm" onclick="window._editMenuItem(${idx})">✏️ Edit</button>
+                            <button class="btn-danger-sm" onclick="window._deleteMenuItem(${idx})">🗑 Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            function renderInventoryTable() {
+                const tbody = document.querySelector('#inventoryTable tbody');
+                tbody.innerHTML = inventory.map((item, idx) => {
+                    const isLow = item.quantity <= item.threshold;
+                    return `<tr>
+                        <td><strong>${item.name}</strong></td>
+                        <td class="${isLow ? 'text-danger' : ''}">${item.quantity}</td>
+                        <td>${item.unit}</td>
+                        <td>${isLow ? '<span class="badge badge-danger">Low Stock</span>' : '<span class="badge badge-success">In Stock</span>'}</td>
+                        <td><button class="btn-success-sm" onclick="window._updateStock(${idx})">📝 Update</button></td>
+                    </tr>`;
+                }).join('');
+            }
+
+            function renderOrdersTable(filter = 'all') {
+                const tbody = document.querySelector('#ordersTableFull tbody');
+                const filtered = filter === 'all' ? [...orders] : orders.filter(o => o.status === filter);
+                tbody.innerHTML = filtered.map((o, idx) => {
+                    let badgeClass = 'badge-neutral';
+                    if (o.status === 'Done') badgeClass = 'badge-success';
+                    if (o.status === 'Preparing') badgeClass = 'badge-info';
+                    if (o.status === 'Pending') badgeClass = 'badge-warning';
+                    const origIdx = orders.indexOf(o);
+                    return `<tr>
+                        <td><strong>${o.id}</strong></td>
+                        <td>${o.customer}</td>
+                        <td>${o.items} item(s)</td>
+                        <td><strong>$${o.total.toFixed(2)}</strong></td>
+                        <td><span class="badge ${badgeClass}">${o.status}</span></td>
+                        <td class="text-muted">${o.time}</td>
+                        <td>
+                            ${o.status === 'Pending' ? `<button class="btn-success-sm" onclick="window._advanceOrder(${origIdx})">▶ Start</button>` : ''}
+                            ${o.status === 'Preparing' ? `<button class="btn-edit-sm" onclick="window._advanceOrder(${origIdx})">✅ Complete</button>` : ''}
+                            ${o.status === 'Done' ? `<span class="text-success" style="font-size:0.78rem;">Completed</span>` : ''}
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+
+            function renderStaffTable() {
+                const tbody = document.querySelector('#staffTable tbody');
+                tbody.innerHTML = staff.map((s, idx) => {
+                    let roleBadge = 'badge-neutral';
+                    if (s.role === 'Admin') roleBadge = 'badge-danger';
+                    if (s.role === 'Cashier') roleBadge = 'badge-info';
+                    if (s.role === 'Kitchen') roleBadge = 'badge-warning';
+                    return `<tr>
+                        <td><strong>${s.name}</strong></td>
+                        <td><span class="badge ${roleBadge}">${s.role}</span></td>
+                        <td class="text-muted">${s.email}</td>
+                        <td>${s.active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-neutral">Disabled</span>'}</td>
+                        <td>
+                            <label class="toggle-switch">
+                                <input type="checkbox" ${s.active ? 'checked' : ''} onchange="window._toggleStaff(${idx}, this.checked)" />
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+
+            function renderReportTopItems() {
+                const items = getTopSellingItems();
+                document.getElementById('reportTopItems').innerHTML = items.map((item, i) => `
+                    <div class="top-item">
+                        <div class="rank gold">${item.rank}</div>
+                        <div class="item-info"><div class="item-name">${item.name}</div></div>
+                        <div class="item-revenue">$${item.revenue}</div>
+                    </div>
+                `).join('');
+            }
+
+            // ==================== CHART RENDERING ====================
+            function drawBarChart(canvasId, dataPoints) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                const container = canvas.parentElement;
+                const dpr = window.devicePixelRatio || 1;
+                const rect = container.getBoundingClientRect();
+                const width = rect.width;
+                const height = 260;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+                ctx.clearRect(0, 0, width, height);
+
+                const padding = { top: 30, right: 20, bottom: 45, left: 50 };
+                const chartW = width - padding.left - padding.right;
+                const chartH = height - padding.top - padding.bottom;
+                const maxVal = Math.max(...dataPoints.map(d => d.value)) * 1.2 || 10;
+                const barWidth = Math.min((chartW / dataPoints.length) * 0.65, 50);
+                const gap = chartW / dataPoints.length;
+
+                // Grid lines
+                ctx.strokeStyle = '#f0eae4';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 5; i++) {
+                    const y = padding.top + (chartH / 5) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(padding.left, y);
+                    ctx.lineTo(width - padding.right, y);
+                    ctx.stroke();
+                    ctx.fillStyle = '#9a8d84';
+                    ctx.font = '11px "Segoe UI", system-ui, sans-serif';
+                    ctx.textAlign = 'right';
+                    ctx.fillText('$' + Math.round(maxVal - (maxVal / 5) * i), padding.left - 8, y + 4);
+                }
+
+                // Bars
+                dataPoints.forEach((d, i) => {
+                    const barH = (d.value / maxVal) * chartH;
+                    const x = padding.left + gap * i + (gap - barWidth) / 2;
+                    const y = padding.top + chartH - barH;
+
+                    // Gradient
+                    const gradient = ctx.createLinearGradient(x, y, x, padding.top + chartH);
+                    gradient.addColorStop(0, '#c8956c');
+                    gradient.addColorStop(1, '#e8c9a8');
+                    ctx.fillStyle = gradient;
+
+                    // Rounded top bar
+                    const radius = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(x + radius, y);
+                    ctx.lineTo(x + barWidth - radius, y);
+                    ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + radius);
+                    ctx.lineTo(x + barWidth, padding.top + chartH);
+                    ctx.lineTo(x, padding.top + chartH);
+                    ctx.lineTo(x, y + radius);
+                    ctx.quadraticCurveTo(x, y, x + radius, y);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Value on top
+                    ctx.fillStyle = '#1a100b';
+                    ctx.font = 'bold 11px "Segoe UI", system-ui, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('$' + d.value, x + barWidth / 2, y - 8);
+
+                    // Label
+                    ctx.fillStyle = '#6b5e55';
+                    ctx.font = '11px "Segoe UI", system-ui, sans-serif';
+                    ctx.fillText(d.label, x + barWidth / 2, padding.top + chartH + 22);
+                });
+            }
+
+            function getWeeklySalesData() {
+                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                return days.map(d => ({ label: d, value: Math.round(80 + Math.random() * 220) }));
+            }
+
+            const weeklyData = getWeeklySalesData();
+
+            function drawAllCharts() {
+                drawBarChart('salesChart', weeklyData);
+                drawBarChart('reportChart', weeklyData);
+            }
+
+            // ==================== NAVIGATION ====================
+            function navigateTo(pageName) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById('page-' + pageName);
+                if (target) target.classList.add('active');
+                document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
+                const navBtn = document.querySelector(`.sidebar-nav button[data-page="${pageName}"]`);
+                if (navBtn) navBtn.classList.add('active');
+                // Refresh relevant data
+                if (pageName === 'dashboard') {
+                    renderKPIs();
+                    renderRecentOrders();
+                    renderTopSelling();
+                    renderLowInventory();
+                    setTimeout(() => drawBarChart('salesChart', weeklyData), 100);
+                }
+                if (pageName === 'menu') renderMenuTable();
+                if (pageName === 'inventory') renderInventoryTable();
+                if (pageName === 'orders') renderOrdersTable();
+                if (pageName === 'staff') renderStaffTable();
+                if (pageName === 'reports') {
+                    renderReportKPIs();
+                    renderReportTopItems();
+                    setTimeout(() => drawBarChart('reportChart', weeklyData), 100);
+                }
+                // Close mobile sidebar
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('show');
+                // Scroll to top
+                document.getElementById('mainContent').scrollTop = 0;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // ==================== EVENT HANDLERS ====================
+            // Sidebar nav buttons
+            document.querySelectorAll('.sidebar-nav button[data-page]').forEach(btn => {
+                btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+            });
+
+            // Inline nav links (like "View all →")
+            document.addEventListener('click', (e) => {
+                if (e.target.dataset.nav) {
+                    e.preventDefault();
+                    navigateTo(e.target.dataset.nav);
+                }
+            });
+
+            // Hamburger
+            document.getElementById('hamburgerBtn').addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('show');
+            });
+            document.getElementById('sidebarOverlay').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('show');
+            });
+
+            // Menu Modal
+            const menuModalOverlay = document.getElementById('menuModalOverlay');
+            document.getElementById('openAddMenuItemBtn').addEventListener('click', () => {
+                document.getElementById('menuModalTitle').textContent = 'Add New Menu Item';
+                document.getElementById('menuEditIndex').value = '-1';
+                document.getElementById('menuForm').reset();
+                menuModalOverlay.classList.remove('hidden');
+            });
+            document.getElementById('cancelMenuBtn').addEventListener('click', () => {
+                menuModalOverlay.classList.add('hidden');
+            });
+            menuModalOverlay.addEventListener('click', (e) => {
+                if (e.target === menuModalOverlay) menuModalOverlay.classList.add('hidden');
+            });
+            document.getElementById('menuForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const editIdx = parseInt(document.getElementById('menuEditIndex').value);
+                const item = {
+                    id: editIdx >= 0 ? menuItems[editIdx].id : nextMenuId++,
+                    name: document.getElementById('menuName').value.trim(),
+                    category: document.getElementById('menuCategory').value,
+                    price: parseFloat(document.getElementById('menuPrice').value),
+                };
+                if (editIdx >= 0) {
+                    menuItems[editIdx] = item;
+                } else {
+                    menuItems.push(item);
+                }
+                menuModalOverlay.classList.add('hidden');
+                renderMenuTable();
+            });
+
+            // Inventory Modal
+            const inventoryModalOverlay = document.getElementById('inventoryModalOverlay');
+            document.getElementById('cancelInvBtn').addEventListener('click', () => {
+                inventoryModalOverlay.classList.add('hidden');
+            });
+            inventoryModalOverlay.addEventListener('click', (e) => {
+                if (e.target === inventoryModalOverlay) inventoryModalOverlay.classList.add('hidden');
+            });
+            document.getElementById('inventoryForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const idx = parseInt(document.getElementById('invEditIndex').value);
+                const newQty = parseFloat(document.getElementById('invNewQty').value);
+                if (idx >= 0 && !isNaN(newQty)) {
+                    inventory[idx].quantity = newQty;
+                }
+                inventoryModalOverlay.classList.add('hidden');
+                renderInventoryTable();
+                if (document.getElementById('page-dashboard').classList.contains('active')) {
+                    renderKPIs();
+                    renderLowInventory();
+                }
+            });
+            document.getElementById('refreshInventoryBtn').addEventListener('click', () => {
+                renderInventoryTable();
+            });
+
+            // Order filter buttons
+            document.querySelectorAll('.filter-order-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-order-btn').forEach(b => b.classList
+                        .remove('active'));
+                    btn.classList.add('active');
+                    renderOrdersTable(btn.dataset.filter);
+                });
+            });
+
+            // Staff add button (demo)
+            document.getElementById('addStaffBtn').addEventListener('click', () => {
+                const newStaff = {
+                    name: 'New Employee',
+                    role: 'Cashier',
+                    email: 'new@cafeflow.com',
+                    active: true
+                };
+                staff.push(newStaff);
+                renderStaffTable();
+            });
+
+            // Global search
+            document.getElementById('globalSearch').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                const activePage = document.querySelector('.page.active');
+                if (!activePage) return;
+                if (activePage.id === 'page-orders') {
+                    const filtered = orders.filter(o =>
+                        o.customer.toLowerCase().includes(query) ||
+                        o.id.toLowerCase().includes(query) ||
+                        o.status.toLowerCase().includes(query)
+                    );
+                    const tbody = document.querySelector('#ordersTableFull tbody');
+                    tbody.innerHTML = filtered.map((o, idx) => {
+                        let badgeClass = 'badge-neutral';
+                        if (o.status === 'Done') badgeClass = 'badge-success';
+                        if (o.status === 'Preparing') badgeClass = 'badge-info';
+                        if (o.status === 'Pending') badgeClass = 'badge-warning';
+                        const origIdx = orders.indexOf(o);
+                        return `<tr>
+                            <td><strong>${o.id}</strong></td><td>${o.customer}</td><td>${o.items} item(s)</td>
+                            <td><strong>$${o.total.toFixed(2)}</strong></td>
+                            <td><span class="badge ${badgeClass}">${o.status}</span></td>
+                            <td class="text-muted">${o.time}</td>
+                            <td>${o.status === 'Pending' ? `<button class="btn-success-sm" onclick="window._advanceOrder(${origIdx})">▶ Start</button>` : ''}${o.status === 'Preparing' ? `<button class="btn-edit-sm" onclick="window._advanceOrder(${origIdx})">✅ Complete</button>` : ''}${o.status === 'Done' ? '<span class="text-success" style="font-size:0.78rem;">Completed</span>' : ''}</td>
+                        </tr>`;
+                    }).join('');
+                }
+                if (activePage.id === 'page-menu') {
+                    const filtered = menuItems.filter(m =>
+                        m.name.toLowerCase().includes(query) || m.category.toLowerCase().includes(
+                            query)
+                    );
+                    const tbody = document.querySelector('#menuTable tbody');
+                    const origIdxMap = new Map(filtered.map((f, i) => [i, menuItems.indexOf(f)]));
+                    tbody.innerHTML = filtered.map((item, i) => {
+                        const origIdx = origIdxMap.get(i);
+                        return `<tr>
+                            <td>${item.id}</td><td><strong>${item.name}</strong></td>
+                            <td><span class="badge badge-neutral">${item.category}</span></td>
+                            <td><strong>$${item.price.toFixed(2)}</strong></td>
+                            <td><button class="btn-edit-sm" onclick="window._editMenuItem(${origIdx})">✏️ Edit</button> <button class="btn-danger-sm" onclick="window._deleteMenuItem(${origIdx})">🗑 Delete</button></td>
+                        </tr>`;
+                    }).join('');
+                }
+            });
+
+            // ==================== GLOBAL FUNCTIONS (exposed for inline onclick) ====================
+            window._editMenuItem = function(idx) {
+                const item = menuItems[idx];
+                document.getElementById('menuModalTitle').textContent = 'Edit Menu Item';
+                document.getElementById('menuEditIndex').value = idx;
+                document.getElementById('menuName').value = item.name;
+                document.getElementById('menuCategory').value = item.category;
+                document.getElementById('menuPrice').value = item.price;
+                menuModalOverlay.classList.remove('hidden');
+            };
+            window._deleteMenuItem = function(idx) {
+                if (confirm(`Delete "${menuItems[idx].name}"? This cannot be undone.`)) {
+                    menuItems.splice(idx, 1);
+                    renderMenuTable();
+                }
+            };
+            window._updateStock = function(idx) {
+                document.getElementById('invEditIndex').value = idx;
+                document.getElementById('invItemName').textContent = inventory[idx].name;
+                document.getElementById('invNewQty').value = inventory[idx].quantity;
+                inventoryModalOverlay.classList.remove('hidden');
+            };
+            window._toggleStaff = function(idx, checked) {
+                staff[idx].active = checked;
+                renderStaffTable();
+            };
+            window._advanceOrder = function(idx) {
+                const order = orders[idx];
+                if (order.status === 'Pending') order.status = 'Preparing';
+                else if (order.status === 'Preparing') order.status = 'Done';
+                renderOrdersTable(document.querySelector('.filter-order-btn.active')?.dataset?.filter || 'all');
+                renderRecentOrders();
+                renderKPIs();
+                document.getElementById('activeOrdersBadge').textContent = getActiveOrdersCount();
+            };
+
+            // ==================== LIVE CLOCK ====================
+            function updateLiveTime() {
+                const now = new Date();
+                document.getElementById('liveTime').textContent =
+                    now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short',
+                        day: 'numeric' }) +
+                    ' · ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            }
+            updateLiveTime();
+            setInterval(updateLiveTime, 30000);
+
+            // ==================== INITIALIZATION ====================
+            function init() {
+                renderKPIs();
+                renderRecentOrders();
+                renderTopSelling();
+                renderLowInventory();
+                renderMenuTable();
+                renderInventoryTable();
+                renderOrdersTable();
+                renderStaffTable();
+                renderReportKPIs();
+                renderReportTopItems();
+                setTimeout(drawAllCharts, 150);
+            }
+
+            init();
+
+            // Redraw charts on resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    const activePage = document.querySelector('.page.active');
+                    if (activePage && activePage.id === 'page-dashboard') {
+                        drawBarChart('salesChart', weeklyData);
+                    }
+                    if (activePage && activePage.id === 'page-reports') {
+                        drawBarChart('reportChart', weeklyData);
+                    }
+                }, 300);
+            });
+
+            console.log('☕ CaféFlow Dashboard ready — All systems initialized.');
+            console.log('📊 Data:', { menuItems: menuItems.length, inventory: inventory.length, staff: staff
+                    .length, orders: orders.length });
+            console.log('🔌 Structure is Firebase-ready — replace data layer to connect.');
+        })();
+    </script>
+</body>
+</html>
